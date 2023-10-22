@@ -7,6 +7,7 @@ class Chess_board
   include Chess_methods
 
   attr_accessor :pieces_array, :clear_board, :position_matrix
+  attr_reader :white_king, :black_king
 
   def initialize
     @pieces_array = []
@@ -17,7 +18,13 @@ class Chess_board
     #the pieces
     create_white_pieces
     create_black_pieces
+
+    #And this creates the position matrix
     update_position_matrix
+
+    #This is usefull for the win condition
+    @white_king = pieces_array[3]
+    @black_king = pieces_array[19]
   end
 
   def pretty_print(selected = nil)
@@ -25,13 +32,23 @@ class Chess_board
     #position matrix.
 
     puts Rainbow("  0 1 2 3 4 5 6 7").yellow
+
     clear_board.each_with_index do |row, row_index|
       print Rainbow("#{row_index} ").yellow
       row.each_with_index do |tile, column_index|
         piece = position_matrix[row_index][column_index]
 
         #Distinguish the piece from the empty tile
-        piece == nil ? (print tile) : (print piece.symbol)
+        if piece == nil
+          print tile
+        else
+          #Print red if the piece is selected
+          if piece == selected
+            print Rainbow(piece.symbol).red
+          else
+            print piece.symbol
+          end
+        end
         print " "
       end
       puts "\n"
@@ -39,20 +56,63 @@ class Chess_board
 
   end
 
-  private
-
   def update_position_matrix
+    @position_matrix = create_position_matrix #This resets the position matrix
+
     #Now, populate the matrix with the chess piece objects
     @pieces_array.each do |piece|
 
       row = piece.position[0]
       column = piece.position[1]
 
-      @position_matrix[row][column] = piece
-
+      #Only add the live pieces in every update
+      if piece.state == 1
+        @position_matrix[row][column] = piece
+      end
     end
+  end
+
+  def piece?(coordinates)
+    tile = @position_matrix[coordinates[0]][coordinates[1]]
+
+    #Check if the selected tile holds a Piece class object
+    tile.class.ancestors.include?(Pieces)
+  end
+
+  def move_piece(coordenada_inicial, coordenada_final)
+    return false unless piece?(coordenada_inicial) #If not a piece, abort the method
+
+    kill(coordenada_final) #Kill the piece if found in the objective position
+
+    #Replace the position coordinates and update the position matrix
+    @position_matrix[coordenada_inicial[0]][coordenada_inicial[1]].position = coordenada_final
+    update_position_matrix
+  end
+
+  def kill(coordenada_final)
+    return unless piece?(coordenada_final) #If not a piece in the tile, abort the method
+
+    @position_matrix[coordenada_final[0]][coordenada_final[1]].state = 0 #Kills the piece
+  end
+
+  def check?(coordinates)
+    #we use the destination/possible coordinates to identify if the king is in danger
+    white_king_coordinates = white_king.position
+    black_king_coordinates = black_king.position
+
+    if (coordinates.include?(white_king_coordinates) || coordinates.include?(black_king_coordinates))
+      return true
+    end
+    return false
+  end
+
+  def check_mate?
+    if (white_king.state == 0 || black_king.state == 0)
+      return true
+    end
+    return false
   end
 end
 
 board = Chess_board.new
-board.pretty_print
+board.pretty_print(board.position_matrix[7][0])
