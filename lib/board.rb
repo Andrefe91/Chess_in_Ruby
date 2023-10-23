@@ -43,8 +43,8 @@ class Chess_board
           print tile
         else
           #Print red if the piece is selected
-          if piece == selected
-            print Rainbow(piece.symbol).red
+          if [row_index,column_index] == selected
+            print Rainbow(piece.symbol).red.bright
           else
             print piece.symbol
           end
@@ -83,7 +83,11 @@ class Chess_board
     row = coordinate[0]
     column = coordinate[1]
 
-    position_matrix[row][column].color == color
+    begin #Rescue code in case the selected tile doesnt have a chess piece
+      position_matrix[row][column].color == color
+    rescue NoMethodError
+      return false
+    end
   end
 
   def move_piece(coordenada_inicial, coordenada_final)

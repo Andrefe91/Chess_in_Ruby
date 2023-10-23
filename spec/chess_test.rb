@@ -183,47 +183,60 @@ describe Chess_board do
 end
 
 describe Chess_game do
-  context "when checking for valid coordinates" do
-    subject(:valid_input) {described_class.new}
+  describe "#valid_coordinates?" do
+    context "when checking for valid coordinates" do
+      subject(:valid_input) {described_class.new}
 
-    it "returns false when the coordinates dont correspond  to an Array" do
-      valid = valid_input.valid_coordinates(2)
-      expect(valid).to be false
+      it "returns false when the coordinates dont correspond  to an Array" do
+        valid = valid_input.valid_coordinates?(2)
+        expect(valid).to be false
+      end
+
+      it "returns false when the coordinates are less than 2" do
+        valid = valid_input.valid_coordinates?([1])
+        expect(valid).to be false
+      end
+
+      it "returns false when the coordinates are longer than 2" do
+        valid = valid_input.valid_coordinates?([1,2,3])
+        expect(valid).to be false
+      end
+
+      it "returns false when the row is bigger than 7" do
+        valid = valid_input.valid_coordinates?([8,2])
+        expect(valid).to be false
+      end
+
+      it "returns false when the column is bigger than 7" do
+        valid = valid_input.valid_coordinates?([1,8])
+        expect(valid).to be false
+      end
+
+      it "returns false when the row is not an integer" do
+        valid = valid_input.valid_coordinates?([2.5,8])
+        expect(valid).to be false
+      end
+
+      it "returns false when the column is not an integer" do
+        valid = valid_input.valid_coordinates?([2,5.5])
+        expect(valid).to be false
+      end
+
+      it "returns true when the coordinates are valid" do
+        valid = valid_input.valid_coordinates?([2,5])
+        expect(valid).to be true
+      end
     end
+  end
 
-    it "returns false when the coordinates are less than 2" do
-      valid = valid_input.valid_coordinates([1])
-      expect(valid).to be false
-    end
+  describe "#to_array" do
+    context "Converting input to an array" do
+      subject(:game_array) {described_class.new}
 
-    it "returns false when the coordinates are longer than 2" do
-      valid = valid_input.valid_coordinates([1,2,3])
-      expect(valid).to be false
-    end
-
-    it "returns false when the row is bigger than 7" do
-      valid = valid_input.valid_coordinates([8,2])
-      expect(valid).to be false
-    end
-
-    it "returns false when the column is bigger than 7" do
-      valid = valid_input.valid_coordinates([1,8])
-      expect(valid).to be false
-    end
-
-    it "returns false when the row is not an integer" do
-      valid = valid_input.valid_coordinates([2.5,8])
-      expect(valid).to be false
-    end
-
-    it "returns false when the column is not an integer" do
-      valid = valid_input.valid_coordinates([2,5.5])
-      expect(valid).to be false
-    end
-
-    it "returns true when the coordinates are valid" do
-      valid = valid_input.valid_coordinates([2,5])
-      expect(valid).to be true
+      it "returns an array" do
+        array = game_array.to_array("[1,2]")
+        expect(array).to eq [1,2]
+      end
     end
   end
 end
