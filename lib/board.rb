@@ -79,6 +79,13 @@ class Chess_board
     tile.class.ancestors.include?(Pieces)
   end
 
+  def valid_color_piece?(coordinate, color)
+    row = coordinate[0]
+    column = coordinate[1]
+
+    position_matrix[row][column].color == color
+  end
+
   def move_piece(coordenada_inicial, coordenada_final)
     return false unless piece?(coordenada_inicial) #If not a piece, abort the method
 
@@ -114,5 +121,5 @@ class Chess_board
   end
 end
 
-board = Chess_board.new
-board.pretty_print(board.position_matrix[7][0])
+#board = Chess_board.new
+#board.pretty_print(board.position_matrix[7][0])

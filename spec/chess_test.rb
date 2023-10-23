@@ -1,5 +1,6 @@
 require_relative '../lib/pieces_classes'
 require_relative '../lib/board'
+require_relative '../lib/chess_game'
 
 describe King do
 
@@ -38,6 +39,36 @@ describe Chess_board do
         is_a_piece = game.piece?([5,0])
 
         expect(is_a_piece).to be false
+      end
+    end
+  end
+
+  describe "#valid_color_piece?" do
+    context "when checking a piece color" do
+      subject(:game_color) { described_class.new }
+
+      it "returns True when the selected piece is White in white's turn" do
+        valid = game_color.valid_color_piece?([7,0], "white")
+
+        expect(valid).to be true
+      end
+
+      it "returns False when the selected piece is White in black's turn" do
+        valid = game_color.valid_color_piece?([7,0], "black")
+
+        expect(valid).to_not be true
+      end
+
+      it "returns True when the selected piece is Black in Black's turn" do
+        valid = game_color.valid_color_piece?([0,0], "black")
+
+        expect(valid).to be true
+      end
+
+      it "returns False when the selected piece is Black in White's turn" do
+        valid = game_color.valid_color_piece?([0,0], "white")
+
+        expect(valid).to_not be true
       end
     end
   end
@@ -147,6 +178,52 @@ describe Chess_board do
 
         expect(check).to_not be true
       end
+    end
+  end
+end
+
+describe Chess_game do
+  context "when checking for valid coordinates" do
+    subject(:valid_input) {described_class.new}
+
+    it "returns false when the coordinates dont correspond  to an Array" do
+      valid = valid_input.valid_coordinates(2)
+      expect(valid).to be false
+    end
+
+    it "returns false when the coordinates are less than 2" do
+      valid = valid_input.valid_coordinates([1])
+      expect(valid).to be false
+    end
+
+    it "returns false when the coordinates are longer than 2" do
+      valid = valid_input.valid_coordinates([1,2,3])
+      expect(valid).to be false
+    end
+
+    it "returns false when the row is bigger than 7" do
+      valid = valid_input.valid_coordinates([8,2])
+      expect(valid).to be false
+    end
+
+    it "returns false when the column is bigger than 7" do
+      valid = valid_input.valid_coordinates([1,8])
+      expect(valid).to be false
+    end
+
+    it "returns false when the row is not an integer" do
+      valid = valid_input.valid_coordinates([2.5,8])
+      expect(valid).to be false
+    end
+
+    it "returns false when the column is not an integer" do
+      valid = valid_input.valid_coordinates([2,5.5])
+      expect(valid).to be false
+    end
+
+    it "returns true when the coordinates are valid" do
+      valid = valid_input.valid_coordinates([2,5])
+      expect(valid).to be true
     end
   end
 end
