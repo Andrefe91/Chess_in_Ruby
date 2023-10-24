@@ -6,8 +6,8 @@ require 'rainbow'
 class Chess_game
   include Chess_methods
 
-  attr_accessor
-  attr_reader :turn, :board, :selected_piece_coordinates
+  attr_accessor :selected_piece
+  attr_reader :turn, :board, :selected_piece_coordinates, :valid_movements
 
   def initialize
     @board = Chess_board.new
@@ -30,6 +30,8 @@ class Chess_game
       call_turn
       select_piece
       board.pretty_print(selected_piece_coordinates)
+      @selected_piece = return_piece
+      generate_coordinates
       move_piece
       board.pretty_print
     end
@@ -119,6 +121,36 @@ class Chess_game
 
     return true
   end
+
+  def return_piece
+    coordinate_row = selected_piece_coordinates[0]
+    coordinate_column = selected_piece_coordinates[1]
+
+    board.position_matrix[coordinate_row][coordinate_column]
+  end
+
+  def valid_movements(piece)
+    #Help distinguish if the piece is a pawn or something else
+
+    valid_movements_rest(piece)
+  end
+
+  def valid_movements_rest(piece)
+    #This method returns the valid coordinates for the given piece
+
+  end
+
+  def generate_coordinates
+    coordinates = []
+    #The selected piece has all the information we need
+    position = @selected_piece.position
+
+    #And now, we obtain the coordinates for a given piece type
+    moves = movements(@selected_piece.type)
+
+    
+  end
+
 
   def print_error(error)
     #General method to print error in color red to console

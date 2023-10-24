@@ -239,4 +239,19 @@ describe Chess_game do
       end
     end
   end
+
+  describe "#return_piece" do
+    context "When selecting a valid coordinate" do
+      let(:game_piece) { described_class.new }
+
+      it "Returns a Pawn if selected coordinate is [6,1]" do
+        game_piece.instance_variable_set(:@selected_piece_coordinates, [6,1])
+        piece = game_piece.return_piece
+        clase = piece.type
+
+        expect(clase).to eq "Pawn"
+      end
+    end
+  end
+
 end
