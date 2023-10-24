@@ -1,9 +1,11 @@
 require_relative './board'
-
+require_relative './chess_modules'
 
 require 'rainbow'
 
 class Chess_game
+  include Chess_methods
+
   attr_accessor
   attr_reader :turn, :board, :selected_piece_coordinates
 
@@ -11,6 +13,8 @@ class Chess_game
     @board = Chess_board.new
     @turn = "black"
     @selected_piece_coordinates = nil
+    @selected_piece = nil
+    @valid_movements = []
   end
 
   def play
@@ -127,6 +131,8 @@ class Chess_game
       What do you say, another round ?? 😉
     MULTI_LINE_TEXT
   end
+
+
 end
 
 game = Chess_game.new
