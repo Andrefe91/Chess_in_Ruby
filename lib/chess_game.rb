@@ -31,7 +31,7 @@ class Chess_game
       select_piece
       board.pretty_print(selected_piece_coordinates)
       @selected_piece = return_piece
-      generate_coordinates
+      valid_movements_rest
       move_piece
       board.pretty_print
     end
@@ -122,9 +122,9 @@ class Chess_game
     return true
   end
 
-  def return_piece
-    coordinate_row = selected_piece_coordinates[0]
-    coordinate_column = selected_piece_coordinates[1]
+  def return_piece(coordinates = selected_piece_coordinates)
+    coordinate_row = coordinates[0]
+    coordinate_column = coordinates[1]
 
     board.position_matrix[coordinate_row][coordinate_column]
   end
@@ -135,10 +135,7 @@ class Chess_game
     valid_movements_rest(piece)
   end
 
-  def valid_movements_rest(piece)
-    #This method returns the valid coordinates for the given piece
 
-  end
 
   def generate_coordinates
     coordinates = []
@@ -148,7 +145,63 @@ class Chess_game
     #And now, we obtain the coordinates for a given piece type
     moves = movements(@selected_piece.type)
 
-    
+    moves.each do |series|
+      array = [] #This will help preserve the series information
+
+      series.each do |coordinate|
+        array.append([coordinate[0]+position[0], coordinate[1]+position[1]])
+      end
+
+      coordinates.append(array) #This way, every array inside coordinates it's a series
+    end
+
+    coordinates
+  end
+
+  def prune_movements
+    raw_movements = generate_coordinates
+
+    pruned_coordinates = []
+
+    #For each series, chech if coordinates are between 0 and 7
+    raw_movements.each do |series|
+      array = [] #This will help preserve the series information
+      series.each do |coordinate|
+        array.append(coordinate) if (coordinate.max <= 7 && coordinate.min >= 0 )
+      end
+
+      #This way, every array inside coordinates it's a series and non viable trajectories arent added
+      pruned_coordinates.append(array) if array.length > 0
+    end
+
+    pruned_coordinates
+  end
+
+  def valid_movements_rest
+    #This method returns the valid coordinates for the given piece
+
+    #Initialize the variables
+    color = @selected_piece.color
+    pruned_movements_array = prune_movements
+    valid_movements_array = []
+
+    pruned_movements_array.each do |series|
+      series.each do |coordinate|
+        piece = return_piece(coordinate)
+        piece_color = piece.color unless piece.nil?
+
+        if piece.nil? #If empty tile, add
+          valid_movements_array.append(coordinate)
+        elsif piece_color != @turn #If full tile, with piece of different color, add
+          valid_movements_array.append(coordinate)
+          break
+        else
+          break #If full tile with piece of same color, break
+        end
+      end
+    end
+
+    valid_movements_array
   end
 
 
@@ -163,8 +216,6 @@ class Chess_game
       What do you say, another round ?? 😉
     MULTI_LINE_TEXT
   end
-
-
 end
 
 game = Chess_game.new
