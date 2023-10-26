@@ -135,8 +135,6 @@ class Chess_game
     valid_movements_rest(piece)
   end
 
-
-
   def generate_coordinates
     coordinates = []
     #The selected piece has all the information we need
@@ -178,7 +176,7 @@ class Chess_game
   end
 
   def valid_movements_rest
-    #This method returns the valid coordinates for the given piece
+    #This method returns the valid coordinates for the given piece, except pawn
 
     #Initialize the variables
     color = @selected_piece.color
@@ -204,6 +202,16 @@ class Chess_game
     valid_movements_array
   end
 
+  def valid_movements_pawn
+    #This method returns the valid coordinates for the given pawn
+
+    #Initialize the variables
+    color = @selected_piece.color
+    pruned_movements_array = prune_movements
+    valid_movements_array = []
+
+    
+  end
 
   def print_error(error)
     #General method to print error in color red to console
