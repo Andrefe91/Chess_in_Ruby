@@ -1,7 +1,8 @@
 require_relative './board'
 require_relative './chess_modules'
-
+require 'yaml'
 require 'rainbow'
+require 'fileutils'
 
 class Chess_game
   include Chess_methods
@@ -17,6 +18,12 @@ class Chess_game
     @valid_movements_array = []
   end
 
+  def yaml_initialize(tag, values)
+    @board = values['board']
+    @turn = values['turn']
+    board.pretty_print
+  end
+
   def play
     print_welcome
     board.pretty_print
@@ -24,11 +31,51 @@ class Chess_game
     win_text
   end
 
+  def save_file
+    print 'Name for the save file: '
+    filename = gets.chomp
+
+    #Construct the file path with the specified directory
+    file_path = File.join("./save_file", "#{filename}.yaml")
+
+    # Saving file to root directory
+    File.open(file_path, 'w') do |file|
+      file.write(YAML.dump(@board))
+      file.write(YAML.dump(@turn))
+    end
+    print 'Game saved !!, the program will finish now'
+    exit(0)
+  end
+
+  def load_file
+    print 'Name of the Save Game to load: '
+    filename = gets.chomp
+
+    #Construct the file path with the specified directory
+    file_path = File.join("./save_file", "#{filename}.yaml")
+
+    # Open the file with a rescue clause in case the file doesn't exist
+    begin
+      File.open(file_path, 'r') do |file|
+        object = YAML.safe_load(file, permitted_classes: [Chess_board, Rook, Knight,
+         Bishop, King, Queen, Pawn], aliases: true)
+        print 'Game loaded !!'
+        # Return the object or else stop existing after the block
+        return object
+      end
+    rescue Errno::ENOENT
+      puts "** Error, no file found under the name: \"#{filename}.yaml\" **"
+    end
+  end
+
   def game_loop
     until board.check_mate?
       change_turn
       call_turn
       select_piece
+
+      #This prints the board, along with the permitted movements of the piece
+      #If this behaviour is not wanted, remove the @valid_movements_array
       board.pretty_print(selected_piece_coordinates,@valid_movements_array)
       print "Valid Movements: #{@valid_movements_array}"
       move_piece
@@ -59,7 +106,9 @@ class Chess_game
   def select_piece
     while true
       while true
-        coordinates = gets.chomp
+        coordinates = gets.chomp.downcase
+        save_file if coordinates == "save" #Calling the saving method
+
         break if (valid_coordinates?(to_array(coordinates)) && board.valid_color_piece?(to_array(coordinates), turn))
         print_error("Invalid Coordinates")
         print "Select a piece by coordinate: "
@@ -303,4 +352,5 @@ class Chess_game
 end
 
 game = Chess_game.new
+game.load_file
 game.play
