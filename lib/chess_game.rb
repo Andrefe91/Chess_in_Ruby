@@ -14,7 +14,7 @@ class Chess_game
     @turn = "black"
     @selected_piece_coordinates = nil
     @selected_piece = nil
-    @valid_movements = []
+    @valid_movements_array = []
   end
 
   def play
@@ -30,8 +30,7 @@ class Chess_game
       call_turn
       select_piece
       board.pretty_print(selected_piece_coordinates)
-      @selected_piece = return_piece
-      valid_movements_rest
+      print "Valid Movements: #{@valid_movements_array}"
       move_piece
       board.pretty_print
     end
@@ -59,12 +58,24 @@ class Chess_game
 
   def select_piece
     while true
-      coordinates = gets.chomp
-      break if (valid_coordinates?(to_array(coordinates)) && board.valid_color_piece?(to_array(coordinates), turn))
-      print_error("Invalid Coordinates")
+      while true
+        coordinates = gets.chomp
+        break if (valid_coordinates?(to_array(coordinates)) && board.valid_color_piece?(to_array(coordinates), turn))
+        print_error("Invalid Coordinates")
+        print "Select a piece by coordinate: "
+      end
+
+      #Once we check that the coordinates are valid, we calculate and check the valid movements of the
+      #piece.
+      @selected_piece_coordinates = to_array(coordinates)
+      @selected_piece = return_piece #Set the selected piece
+      @valid_movements_array = valid_movements #Calls the valid movements for the piece
+
+      break if @valid_movements_array.length > 0
+      print_error("Piece has no valid movements")
       print "Select a piece by coordinate: "
     end
-    @selected_piece_coordinates = to_array(coordinates)
+
     puts "\nBoard with the selected piece: \n"
   end
 
@@ -72,11 +83,19 @@ class Chess_game
     start_coordinates = @selected_piece_coordinates
     print "\nInput destination coordinates: "
 
-    while true
-      end_coordinates = gets.chomp
-      break if (valid_coordinates?(to_array(end_coordinates)))
-      print_error("Invalid Coordinates")
-      print "Please, input again destination coordinates for the piece: "
+    while true #First loop, to make sure the movement is valid
+
+      while true #Second loop to make sure the coordinates are valid
+        end_coordinates = gets.chomp
+        break if (valid_coordinates?(to_array(end_coordinates)))
+        print_error("Invalid Coordinates")
+
+        print "Please, input again destination coordinates for the piece: "
+      end
+
+      break if @valid_movements_array.include?(to_array(end_coordinates))
+      print_error("Movement not valid")
+      print "Input destination coordinates: "
     end
 
     end_coordinates = to_array(end_coordinates)
@@ -119,6 +138,7 @@ class Chess_game
     return false unless row.class == Integer
     return false unless column.class == Integer
 
+
     return true
   end
 
@@ -129,10 +149,16 @@ class Chess_game
     board.position_matrix[coordinate_row][coordinate_column]
   end
 
-  def valid_movements(piece)
+  def valid_movements
     #Help distinguish if the piece is a pawn or something else
 
-    valid_movements_rest(piece)
+    if @selected_piece.type == "Pawn"
+      valid_movements_array = valid_movements_pawn
+    else
+      valid_movements_array = valid_movements_rest
+    end
+
+    valid_movements_array
   end
 
   def generate_coordinates
@@ -207,10 +233,60 @@ class Chess_game
 
     #Initialize the variables
     color = @selected_piece.color
-    pruned_movements_array = prune_movements
+    position = @selected_piece.position
+    row = position[0]
+    column = position[1]
     valid_movements_array = []
 
-    
+    if color == "white"
+      if row == 6
+        if return_piece([row-1,column]).nil?
+          valid_movements_array.append([row-1,column])
+        end
+
+        if return_piece([row-2,column]).nil?
+          valid_movements_array.append([row-2,column])
+        end
+      else
+        if return_piece([row-1,column]).nil?
+          valid_movements_array.append([row-1,column])
+        end
+      end
+
+      unless return_piece([row-1,column-1]).nil? #eat diagonally if opponent peace
+        valid_movements_array.append([row-1,column-1]) if return_piece([row-1,column-1]).color == "black"
+      end
+
+      unless return_piece([row-1,column+1]).nil? #eat diagonally if opponent peace
+        valid_movements_array.append([row-1,column+1]) if return_piece([row-1,column+1]).color == "black"
+      end
+
+    elsif color == "black"
+      if row == 1
+        if return_piece([row+1,column]).nil?
+          valid_movements_array.append([row+1,column])
+
+        end
+
+        if return_piece([row+2,column]).nil?
+          valid_movements_array.append([row+2,column])
+        end
+      else
+        if return_piece([row+1,column]).nil?
+          valid_movements_array.append([row+1,column])
+        end
+      end
+
+      unless return_piece([row+1,column+1]).nil? #eat diagonally if opponent peace
+        valid_movements_array.append([row+1,column+1]) if return_piece([row+1,column+1]).color == "white"
+      end
+
+      unless return_piece([row+1,column-1]).nil? #eat diagonally if opponent peace
+        valid_movements_array.append([row+1,column-1]) if return_piece([row+1,column-1]).color == "white"
+      end
+    end
+
+    valid_movements_array #Return the valid movement array
   end
 
   def print_error(error)
