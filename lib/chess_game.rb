@@ -29,7 +29,7 @@ class Chess_game
       change_turn
       call_turn
       select_piece
-      board.pretty_print(selected_piece_coordinates)
+      board.pretty_print(selected_piece_coordinates,@valid_movements_array)
       print "Valid Movements: #{@valid_movements_array}"
       move_piece
       board.pretty_print

@@ -27,7 +27,7 @@ class Chess_board
     @black_king = pieces_array[19]
   end
 
-  def pretty_print(selected = nil)
+  def pretty_print(selected = nil,valid_movements_array = [])
     #For the pretty printing, we must mix the two matrix, the clear_board and
     #position matrix.
 
@@ -40,13 +40,23 @@ class Chess_board
 
         #Distinguish the piece from the empty tile
         if piece == nil
-          print tile
+          #If tile is within the valid movements, print it in color
+          if valid_movements_array.include?([row_index,column_index])
+            print Rainbow("#{tile}").yellow
+          else
+            print tile
+          end
         else
           #Print red if the piece is selected
           if [row_index,column_index] == selected
             print Rainbow(piece.symbol).red.bright
           else
-            print piece.symbol
+            #If the piece is a target, print it in color
+            if valid_movements_array.include?([row_index,column_index])
+              print Rainbow("#{piece.symbol}").yellow
+            else
+              print piece.symbol
+            end
           end
         end
         print " "
