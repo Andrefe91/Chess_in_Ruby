@@ -16,7 +16,7 @@ This is a command-line chess game implemented in Ruby as the final project for t
 ### Getting Started
 1. Clone the repository to your local machine.
 2. Navigate to the project directory.
-3. Run `ruby chess_game.rb` to start the game.
+3. Run `ruby chess_game.rb` in the /lib subfolder to start the game.
 4. Follow the on-screen instructions to play the game.
 5. To save a game, follow the in-game prompts to save the current state. To load a saved game, select the appropriate option when starting the game.
 
