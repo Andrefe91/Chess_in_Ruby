@@ -18,11 +18,35 @@ class Chess_game
     @valid_movements_array = []
   end
 
-  def play
+  def new_game
     print_welcome
     board.pretty_print
     game_loop
     win_text
+  end
+
+  def saved_game
+    load_file
+    board.pretty_print
+    game_loop
+    win_text
+  end
+
+  def play
+    puts Rainbow("Ruby Chess V1.0.0").red
+    puts "Welcome Player, you have two options: "
+    puts "1. Start a new game"
+    puts "2. Load a saved game"
+    print "Plase, make your selection: "
+    selection = gets.chomp
+
+    if selection == "1"
+      new_game
+    elsif selection == "2"
+      saved_game
+    else
+      puts "Sorry, no valid option was detected, the program will finish."
+    end
   end
 
   def save_file
@@ -53,7 +77,8 @@ class Chess_game
       File.open(file_path, 'r') do |file|
         object = YAML.safe_load(file, permitted_classes: [Chess_board, Rook, Knight,
          Bishop, King, Queen, Pawn], aliases: true)
-        print 'Game loaded !!'
+        puts "\nGame loaded !!"
+        puts "\nLet's continue the game !\n"
         # Return the object or else stop existing after the block
         @board = object
       end
@@ -79,6 +104,7 @@ class Chess_game
 
   def print_welcome
     puts <<~MULTI_LINE_TEXT
+
       #{Rainbow("WELCOME !!").yellow}
 
       This is a game of #{Rainbow("Chess").yellow}, implement in Ruby and played on the console
@@ -346,5 +372,4 @@ class Chess_game
 end
 
 game = Chess_game.new
-game.load_file
 game.play
