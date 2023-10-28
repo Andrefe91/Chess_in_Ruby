@@ -6,13 +6,15 @@ require 'rainbow'
 class Chess_board
   include Chess_methods
 
-  attr_accessor :pieces_array, :clear_board, :position_matrix
+  attr_accessor :pieces_array, :clear_board, :position_matrix, :turn
   attr_reader :white_king, :black_king
 
   def initialize
     @pieces_array = []
     @position_matrix = create_position_matrix
     @clear_board = return_empty_board
+    @turn = "white" #This is a shitty thing to do. This variable exist here so i can save the turn in the
+    #board object, that way i dont have to create aditional code for loading the variable.
 
     #Included in the chess_module file, this two methods populate the board with
     #the pieces

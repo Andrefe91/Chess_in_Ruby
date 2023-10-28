@@ -12,7 +12,7 @@ class Chess_game
 
   def initialize
     @board = Chess_board.new
-    @turn = "black"
+    @turn = "white"
     @selected_piece_coordinates = nil
     @selected_piece = nil
     @valid_movements_array = []
@@ -59,7 +59,6 @@ class Chess_game
     # Saving file to root directory
     File.open(file_path, 'w') do |file|
       file.write(YAML.dump(@board))
-      file.write(YAML.dump(@turn))
     end
     print 'Game saved !!, the program will finish now'
     exit(0)
@@ -81,6 +80,7 @@ class Chess_game
         puts "\nLet's continue the game !\n"
         # Return the object or else stop existing after the block
         @board = object
+        @turn = object.turn
       end
     rescue Errno::ENOENT
       puts "** Error, no file found under the name: \"#{filename}.yaml\" **"
@@ -89,7 +89,6 @@ class Chess_game
 
   def game_loop
     until board.check_mate?
-      change_turn
       call_turn
       select_piece
 
@@ -99,6 +98,7 @@ class Chess_game
       print "Valid Movements: #{@valid_movements_array}"
       move_piece
       board.pretty_print
+      change_turn
     end
   end
 
@@ -181,8 +181,10 @@ class Chess_game
   def change_turn
     if @turn == "white"
       @turn = "black"
+      @board.turn = "black" #Save the turn within the board object, so i can serialize it
     else
       @turn = "white"
+      @board.turn = "white" #Save the turn within the board object, so i can serialize it
     end
   end
 
