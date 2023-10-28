@@ -18,12 +18,6 @@ class Chess_game
     @valid_movements_array = []
   end
 
-  def yaml_initialize(tag, values)
-    @board = values['board']
-    @turn = values['turn']
-    board.pretty_print
-  end
-
   def play
     print_welcome
     board.pretty_print
@@ -61,7 +55,7 @@ class Chess_game
          Bishop, King, Queen, Pawn], aliases: true)
         print 'Game loaded !!'
         # Return the object or else stop existing after the block
-        return object
+        @board = object
       end
     rescue Errno::ENOENT
       puts "** Error, no file found under the name: \"#{filename}.yaml\" **"
